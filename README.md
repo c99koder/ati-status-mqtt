@@ -1,6 +1,9 @@
 # ATI-Status-MQTT
 Publish Acronis True Image backup status notifications to Home Assistant via MQTT
 
+## Configuration
+Open `ati-status-mqtt.py` and enter your MQTT hostname and credentials into the variables at the top of the file
+
 ## Installation
 **Note:** This script currently only supports Acronis True Image 2021
 
@@ -32,13 +35,10 @@ Create a new task in Windows Task Scheduler:
  * Customize settings and then save the task
  * Right click the task and choose `Run` to start it
 
-# Configuration
-Open `ati-status-mac.py` and enter your MQTT hostname and credentials into the variables at the top of the file
-
-# Usage
+## Usage
 Running the Python script will publish the status of all your backups using the notifications that are currently available in the Acronis status menu extra applet.  Home Assistant will automatically discover the new entities, and you can customize the names / icons as usual.
 
-# Example Lovelace Card
+## Example Lovelace Card
 Below is a sample card for the Lovelace dashboard using [Auto-Entities](https://github.com/thomasloven/lovelace-auto-entities) and [Template-Entity-Row](https://github.com/thomasloven/lovelace-template-entity-row)
 
 ![Lovelace Screenshot](https://raw.githubusercontent.com/c99koder/ati-status-mqtt/main/screenshots/card.png)
@@ -64,7 +64,7 @@ filter:
         active: true
 ```
 
-# License
+## License
 
 Copyright (C) 2021 Sam Steele. Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
 

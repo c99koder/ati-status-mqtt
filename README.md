@@ -1,29 +1,39 @@
 # ATI-Status-MQTT
-Publish Acronis True Image for Mac backup status notifications to Home Assistant via MQTT
+Publish Acronis True Image backup status notifications to Home Assistant via MQTT
 
 ## Installation
-**Note:** This script currently only supports Acronis True Image 2021 for Mac
+**Note:** This script currently only supports Acronis True Image 2021
 
 Check your Python version and make sure version 3.8 or newer is installed on your system:
-```
-$ python3 --version
+```sh
+python3 --version
 ```
 
 Install required python3 modules:
-```
-$ pip3 install paho-mqtt
+```sh
+pip3 install paho-mqtt
 ```
 
+### Mac
 Install LaunchAgent to run the script hourly (optional):
-```
+```sh
 sudo cp ati-status-mqtt.py /usr/local/bin
 mkdir -p ~/Library/LaunchAgents
 cp org.c99.ati-status-mqtt.plist ~/Library/LaunchAgents
 launchctl load -w ~/Library/LaunchAgents/org.c99.ati-status-mqtt.plist
 ```
 
+### Windows
+Create a new task in Windows Task Scheduler:
+ * Copy `ati-status-mqtt.py` to `C:\ati-status-mqtt.pyw` *(The pyw extension prevents a CMD window from opening when the script runs)*
+ * Launch `Windows Task Scheduler`
+ * Right click `Task Scheduler Library` and choose `Import Task…`
+ * Browse to `ATI-Status-MQTT.xml`
+ * Customize settings and then save the task
+ * Right click the task and choose `Run` to start it
+
 # Configuration
-Open `ati-status-mqtt.py` and enter your MQTT hostname and credentials into the variables at the top of the file
+Open `ati-status-mac.py` and enter your MQTT hostname and credentials into the variables at the top of the file
 
 # Usage
 Running the Python script will publish the status of all your backups using the notifications that are currently available in the Acronis status menu extra applet.  Home Assistant will automatically discover the new entities, and you can customize the names / icons as usual.

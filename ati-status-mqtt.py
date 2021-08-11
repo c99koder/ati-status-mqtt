@@ -13,7 +13,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import glob, sqlite3, json, time
+import glob, sqlite3, json, time, sys, os, platform
 from datetime import datetime
 import xml.etree.ElementTree as ET
 import paho.mqtt.client as mqtt
@@ -25,8 +25,22 @@ MQTT_PASS = None
 
 backups = {}
 
+if platform.system() == "Windows":
+	ACRONIS_SCRIPTS_PATH = "C:\\ProgramData\\Acronis\\TrueImageHome\\Scripts\\"
+	ACRONIS_DB_PATH = "C:\\ProgramData\\Acronis\\TrueImageHome\\Database\\"
+
+	if sys.executable.endswith("pythonw.exe"):
+		sys.stdout = open(os.path.join(os.getenv("TEMP"), "stdout-"+os.path.basename(sys.argv[0]))+".log", "w");
+		sys.stderr = open(os.path.join(os.getenv("TEMP"), "stderr-"+os.path.basename(sys.argv[0]))+".log", "w")
+elif platform.system() == "Darwin":
+	ACRONIS_SCRIPTS_PATH = "/Library/Application Support/Acronis/TrueImageHome/Scripts/"
+	ACRONIS_DB_PATH = "/Library/Application Support/Acronis/TrueImageHome/Database/"
+else:
+	print("Unsupported system: " + platform.system())
+	sys.exit(1)
+
 # Load backup names from XML scripts
-for script in glob.glob("/Library/Application Support/Acronis/TrueImageHome/Scripts/*.tib.tis"):
+for script in glob.glob(ACRONIS_SCRIPTS_PATH + "*.tib.tis"):
 	root = ET.parse(script).getroot()
 	uuid = root.findall("uuid")[0].text
 	backup = {'friendly_name': root.findall("display")[0].text}
@@ -64,7 +78,11 @@ if len(backups) == 0:
 	sys.exit(1)
 
 # Load status notifications from SQLite database
-db = sqlite3.connect("/Library/Application Support/Acronis/TrueImageHome/Database/TrayCenterStorage")
+if platform.system() == "Windows":
+	os.system("copy " + ACRONIS_DB_PATH + "TrayCenterStorage* " + os.getenv("TEMP") + " > NUL")
+	db = sqlite3.connect(os.getenv("TEMP") + "\\TrayCenterStorage")
+else:
+	db = sqlite3.connect(ACRONIS_DB_PATH + "TrayCenterStorage")
 db.row_factory = sqlite3.Row
 cursor = db.cursor()
 for row in cursor.execute("select * from Notification_ where event_ = 'backup_finished' order by date_ asc"):
@@ -75,6 +93,8 @@ for row in cursor.execute("select * from Notification_ where event_ = 'backup_fi
 		backup['text'] = row['text_']
 
 db.close()
+if platform.system() == "Windows":
+	os.system("del " + os.getenv("TEMP") + "\\TrayCenterStorage* > NUL")
 
 print("Publishing sensor configuration to MQTT")
 client = mqtt.Client()

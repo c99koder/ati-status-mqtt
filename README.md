@@ -22,7 +22,7 @@ Running the Python script will publish the status of all your backups using the 
 ## Installation
 
 ### Mac
-Install LaunchAgent to run the script hourly (optional):
+Install LaunchAgent to run the script hourly:
 ```sh
 sudo cp ati-status-mqtt.py /usr/local/bin
 mkdir -p ~/Library/LaunchAgents

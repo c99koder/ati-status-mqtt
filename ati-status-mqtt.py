@@ -18,7 +18,7 @@ from datetime import datetime
 import xml.etree.ElementTree as ET
 import paho.mqtt.client as mqtt
 
-MQTT_HOST = "homeassistant.local"
+MQTT_HOST = "localhost"
 MQTT_PORT = 1883
 MQTT_USER = None
 MQTT_PASS = None
@@ -36,8 +36,8 @@ elif platform.system() == "Darwin":
 	ACRONIS_SCRIPTS_PATH = "/Library/Application Support/Acronis/TrueImageHome/Scripts/"
 	ACRONIS_DB_PATH = "/Library/Application Support/Acronis/TrueImageHome/Database/"
 else:
-	print("Unsupported system: " + platform.system())
-	sys.exit(1)
+	ACRONIS_SCRIPTS_PATH = "/tmp/ati/"
+	ACRONIS_DB_PATH = "/tmp/ati/"
 
 # Load backup names from XML scripts
 for script in glob.glob(ACRONIS_SCRIPTS_PATH + "*.tib.tis"):
@@ -71,6 +71,8 @@ for script in glob.glob(ACRONIS_SCRIPTS_PATH + "*.tib.tis"):
 		uri = volume.get("uri")
 		if not uri in backup['volumes']:
 			backup['volumes'].append(uri)
+
+	backup['icon'] = 'mdi:folder-question'
 	backups[uuid] = backup
 
 if len(backups) == 0:
@@ -91,6 +93,10 @@ for row in cursor.execute("select * from Notification_ where event_ = 'backup_fi
 		backup['timestamp'] = datetime.fromtimestamp(int(row['date_'])).isoformat()
 		backup['state'] = row['status_']
 		backup['text'] = row['text_']
+		if backup['state'] == "success":
+			backup['icon'] = 'mdi:folder-check'
+		else:
+		 	backup['icon'] = 'mdi:folder-alert'
 
 db.close()
 if platform.system() == "Windows":
@@ -104,6 +110,8 @@ client.connect(MQTT_HOST, MQTT_PORT)
 for uuid, backup in backups.items():
 	client.publish("homeassistant/sensor/" + uuid + "/config", 
 		json.dumps({'name': 'Acronis ' + backup['friendly_name'],
+			'unique_id': uuid,
+			'icon': backup['icon'],
 			'state_topic': "homeassistant/sensor/" + uuid + "/state",
 			'json_attributes_topic': "homeassistant/sensor/" + uuid + "/attributes",
 			'availability_mode': 'latest',

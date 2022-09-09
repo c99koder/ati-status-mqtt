@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-#  Copyright (C) 2021 Sam Steele
+#  Copyright (C) 2022 Sam Steele
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
 #  You may obtain a copy of the License at
@@ -116,17 +116,17 @@ for uuid, backup in backups.items():
 			'json_attributes_topic': "homeassistant/sensor/" + uuid + "/attributes",
 			'availability_mode': 'latest',
 			'availability_topic': "homeassistant/sensor/" + uuid + "/available"
-			}), retain=True)
+			}), retain=True).wait_for_publish()
 
 print("Publishing states to MQTT")
 for uuid, backup in backups.items():
 	if 'timestamp' in backup:
 		print(backup['timestamp'] + " " + backup['friendly_name'] + " - " + backup['state'] + ": " + backup['text'])
-		client.publish("homeassistant/sensor/" + uuid + "/state", backup['state'], retain=True)
-		client.publish("homeassistant/sensor/" + uuid + "/attributes", json.dumps(backup), retain=True)
-		client.publish("homeassistant/sensor/" + uuid + "/available", 'online', retain=True)
+		client.publish("homeassistant/sensor/" + uuid + "/state", backup['state'], retain=True).wait_for_publish()
+		client.publish("homeassistant/sensor/" + uuid + "/attributes", json.dumps(backup), retain=True).wait_for_publish()
+		client.publish("homeassistant/sensor/" + uuid + "/available", 'online', retain=True).wait_for_publish()
 	else:
 		print("No status available for " + backup['friendly_name'])
-		client.publish("homeassistant/sensor/" + uuid + "/available", 'offline', retain=True)
+		client.publish("homeassistant/sensor/" + uuid + "/available", 'offline', retain=True).wait_for_publish()
 
 client.disconnect()

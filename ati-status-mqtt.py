@@ -26,15 +26,15 @@ MQTT_PASS = None
 backups = {}
 
 if platform.system() == "Windows":
-	ACRONIS_SCRIPTS_PATH = "C:\\ProgramData\\Acronis\\TrueImageHome\\Scripts\\"
-	ACRONIS_DB_PATH = "C:\\ProgramData\\Acronis\\TrueImageHome\\Database\\"
+	ACRONIS_SCRIPTS_PATH = "C:\\ProgramData\\Acronis\\CyberProtectHomeOffice\\Scripts\\"
+	ACRONIS_DB_PATH = "C:\\ProgramData\\Acronis\\CyberProtectHomeOffice\\Database\\"
 
 	if sys.executable.endswith("pythonw.exe"):
 		sys.stdout = open(os.path.join(os.getenv("TEMP"), "stdout-"+os.path.basename(sys.argv[0]))+".log", "w");
 		sys.stderr = open(os.path.join(os.getenv("TEMP"), "stderr-"+os.path.basename(sys.argv[0]))+".log", "w")
 elif platform.system() == "Darwin":
-	ACRONIS_SCRIPTS_PATH = "/Library/Application Support/Acronis/TrueImageHome/Scripts/"
-	ACRONIS_DB_PATH = "/Library/Application Support/Acronis/TrueImageHome/Database/"
+	ACRONIS_SCRIPTS_PATH = "/Library/Application Support/Acronis/CyberProtectHomeOffice/Scripts/"
+	ACRONIS_DB_PATH = "/Library/Application Support/Acronis/CyberProtectHomeOffice/Database/"
 else:
 	ACRONIS_SCRIPTS_PATH = "/tmp/ati/"
 	ACRONIS_DB_PATH = "/tmp/ati/"
